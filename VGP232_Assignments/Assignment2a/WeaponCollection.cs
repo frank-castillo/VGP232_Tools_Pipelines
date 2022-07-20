@@ -122,12 +122,14 @@ namespace Assignment2a
                             }
                             else
                             {
-
+                                Console.WriteLine("Failed to parse data into weapon. Please revise original data");
+                                return false;
                             }
                         }
                         else
                         {
                             Console.WriteLine("Incorrect number of columns relating to weapon properties, please revise the data.");
+                            return false;
                         }
                     }
                 }
@@ -135,6 +137,7 @@ namespace Assignment2a
             catch (System.Exception ex)
             {
                 Console.WriteLine("Exception: " + ex.Message);
+                return false;
             }
 
             return true;
