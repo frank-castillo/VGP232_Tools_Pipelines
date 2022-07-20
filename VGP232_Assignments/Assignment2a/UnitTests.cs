@@ -11,7 +11,7 @@ namespace Assignment2a
     [TestFixture]
     public class UnitTests
     {
-        // private WeaponCollection WeaponCollection;
+        private WeaponCollection weaponCollection;
         private string inputPath;
         private string outputPath;
 
@@ -29,7 +29,7 @@ namespace Assignment2a
         {
             inputPath = CombineToAppPath(INPUT_FILE);
             outputPath = CombineToAppPath(OUTPUT_FILE);
-            // WeaponCollection = new WeaponCollection();
+            weaponCollection = new WeaponCollection();
         }
 
         [TearDown]
@@ -48,6 +48,7 @@ namespace Assignment2a
         {
             // Expected Value: 48
             // TODO: call WeaponCollection.GetHighestBaseAttack() and confirm that it matches the expected value using asserts.
+
         }
 
         [Test]

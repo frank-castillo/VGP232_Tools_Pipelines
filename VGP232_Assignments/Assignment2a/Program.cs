@@ -34,7 +34,7 @@ namespace Assignment2a
             string sortColumnName = string.Empty;
 
             // The results to be output to a file or to the console
-            List<Weapon> results = new List<Weapon>();
+            WeaponCollection results = new WeaponCollection();
 
             //args = new string[7];
             //args[0] = "-i";
@@ -63,7 +63,7 @@ namespace Assignment2a
 
                     // TODO: include help info for sort
                     Console.WriteLine("-s or --sort <column name> : outputs the results sorted by column name");
-                    Console.WriteLine("Available Columns: Name, Type, Rarity, BaseAttack");
+                    Console.WriteLine("Available Columns: Name, Type, Rarity, BaseAttack, Image, SecondaryStat, Passive");
 
                     break;
                 }
@@ -97,15 +97,13 @@ namespace Assignment2a
                             {
                                 // This function returns a List<Weapon> once the data is parsed.
                                 wasErrorSolved = true;
-                                results = Parse(inputFile);
+                                results.Load(inputFile);
                             }
                         } while (!wasErrorSolved);
                     }
                 }
                 else if (args[i].ToLower() == "-s" || args[i].ToLower() == "--sort")
                 {
-                    // TODO: set the sortEnabled flag and see if the next argument is set for the column name
-                    // TODO: set the sortColumnName string used for determining if there's another sort function.
                     sortEnabled = true;
 
                     if (args.Length > i + 1)
@@ -122,7 +120,11 @@ namespace Assignment2a
                         else if ((sortColumnName.ToLower() != "type") &&
                                 (sortColumnName.ToLower() != "rarity") &&
                                 (sortColumnName.ToLower() != "name") &&
-                                (sortColumnName.ToLower() != "baseattack"))
+                                (sortColumnName.ToLower() != "baseattack") &&
+                                (sortColumnName.ToLower() != "image") &&
+                                (sortColumnName.ToLower() != "secondarystat") &&
+                                (sortColumnName.ToLower() != "passive")
+                                )
                         {
                             Console.WriteLine("Not a valid column name. Sorting will be done by Name.");
                             sortColumnName = "name";
@@ -135,7 +137,6 @@ namespace Assignment2a
                 }
                 else if (args[i].ToLower() == "-a" || args[i].ToLower() == "--append")
                 {
-                    // TODO: set the appendToFile flag
                     appendToFile = true;
                 }
                 else if (args[i].ToLower() == "-o" || args[i].ToLower() == "--output")
@@ -149,12 +150,10 @@ namespace Assignment2a
 
                         if (string.IsNullOrEmpty(filePath))
                         {
-                            // TODO: print No output file specified.
                             Console.WriteLine("No output file specified.");
                         }
                         else
                         {
-                            // TODO: set the output file to the outputFile
                             outputFile = filePath;
                         }
                     }
@@ -169,7 +168,6 @@ namespace Assignment2a
             {
                 Console.WriteLine($"Sorting by <{sortColumnName}>");
 
-                // TODO: add implementation to determine the column name to trigger a different sort. (Hint: column names are the 4 properties of the weapon class)
                 if (sortColumnName.ToLower() == "type")
                 {
                     // Sorts the list based off of the Weapon type.
@@ -184,6 +182,21 @@ namespace Assignment2a
                 {
                     // Sorts the list based off of the Weapon BaseAttack.
                     results.Sort(Weapon.CompareByBaseAttack);
+                }
+                else if (sortColumnName.ToLower() == "image")
+                {
+                    // Sorts the list based off of the Weapon BaseAttack.
+                    results.Sort(Weapon.CompareByImage);
+                }
+                else if (sortColumnName.ToLower() == "secondarystat")
+                {
+                    // Sorts the list based off of the Weapon BaseAttack.
+                    results.Sort(Weapon.CompareBySecondaryStat);
+                }
+                else if (sortColumnName.ToLower() == "passive")
+                {
+                    // Sorts the list based off of the Weapon BaseAttack.
+                    results.Sort(Weapon.CompareByPassive);
                 }
                 else
                 {
@@ -213,17 +226,12 @@ namespace Assignment2a
                         fs = File.Open(outputFile, FileMode.Create);
                     }
 
-                    // opens a stream writer with the file handle to write to the output file.
-                    // Hint: use writer.WriteLine
-                    // TODO: write the header of the output "Name,Type,Rarity,BaseAttack"
-                    // TODO: use the writer to output the results.
-                    // TODO: print out the file has been saved.
-
                     try
                     {
+                        // opens a stream writer with the file handle to write to the output file.
                         using (StreamWriter writer = new StreamWriter(fs))
                         {
-                            writer.WriteLine("Name,Type,Rarity,BaseAttack");
+                            writer.WriteLine("Name,Type,Image,Rarity,BaseAttack,SecondaryStat,Passive");
 
                             foreach (var weapon in results)
                             {
@@ -249,85 +257,8 @@ namespace Assignment2a
                     }
                 }
             }
+
             Console.WriteLine("Done!");
-        }
-
-        /// <summary>
-        /// Reads the file and line by line parses the data into a List of Weapons
-        /// </summary>
-        /// <param name="fileName">The path to the file</param>
-        /// <returns>The list of Weapons</returns>
-        public static List<Weapon> Parse(string fileName)
-        {
-            // TODO: implement the streamreader that reads the file and appends each line to the list
-            // note that the result that you get from using read is a string, and needs to be parsed 
-            // to an int for certain fields i.e. HP, Attack, etc.
-            // i.e. int.Parse() and if the results cannot be parsed it will throw an exception
-            // or can use int.TryParse() 
-
-            // streamreader https://msdn.microsoft.com/en-us/library/system.io.streamreader(v=vs.110).aspx
-            // Use string split https://msdn.microsoft.com/en-us/library/system.string.split(v=vs.110).aspx
-
-            List<Weapon> output = new List<Weapon>();
-
-            try
-            {
-                using (StreamReader reader = new StreamReader(fileName))
-                {
-                    // Skip the first line because header does not need to be parsed.
-                    // Name,Type,Rarity,BaseAttack
-
-                    string header = reader.ReadLine();
-
-                    // The rest of the lines looks like the following:
-                    // Skyward Blade,Sword,5,46
-                    while (reader.Peek() > 0)
-                    {
-                        string line = reader.ReadLine();
-                        string[] values = line.Split(',');
-                        int tempRarity = 0;
-                        int tempBaseAttack = 0;
-
-                        Weapon weapon = new Weapon();
-                        // TODO: validate that the string array the size expected.
-                        // TODO: use int.Parse or TryParse for stats/number values.
-                        // Populate the properties of the Weapon
-                        // TODO: Add the Weapon to the list
-
-                        if (values.Length == 4)
-                        {
-                            weapon.Name = values[0];
-                            weapon.Type = values[1];
-
-                            if (int.TryParse(values[2], out tempRarity))
-                            {
-                                weapon.Rarity = tempRarity;
-                            }
-                            else
-                            {
-                                Console.WriteLine("Rarity parameter failed parsing.");
-                            }
-
-                            if (int.TryParse(values[3], out tempBaseAttack))
-                            {
-                                weapon.BaseAttack = tempBaseAttack;
-                            }
-                            else
-                            {
-                                Console.WriteLine("Rarity parameter failed parsing.");
-                            }
-
-                            output.Add(weapon);
-                        }
-                    }
-                }
-            }
-            catch (System.Exception ex)
-            {
-                Console.WriteLine("Exception: " + ex.Message);
-            }
-
-            return output;
         }
     }
 }
