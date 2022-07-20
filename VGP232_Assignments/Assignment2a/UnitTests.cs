@@ -24,6 +24,12 @@ namespace Assignment2a
             return Path.Combine(AppDomain.CurrentDomain.BaseDirectory, filename);
         }
 
+        private void LoadCollection()
+        {
+            SetUp();
+            weaponCollection.Load(inputPath);
+        }
+
         [SetUp]
         public void SetUp()
         {
@@ -48,7 +54,9 @@ namespace Assignment2a
         {
             // Expected Value: 48
             // TODO: call WeaponCollection.GetHighestBaseAttack() and confirm that it matches the expected value using asserts.
-            Assert.AreSame(48, weaponCollection.GetHighestBaseAttack());
+            LoadCollection();
+            var value = weaponCollection.GetHighestBaseAttack();
+            Assert.IsTrue( value == 48);
         }
 
         [Test]
@@ -56,21 +64,25 @@ namespace Assignment2a
         {
             // Expected Value: 23
             // TODO: call WeaponCollection.GetLowestBaseAttack() and confirm that it matches the expected value using asserts.
-            Assert.AreSame(23, weaponCollection.GetLowestBaseAttack());
+            LoadCollection();
+            var value = weaponCollection.GetLowestBaseAttack();
+            Assert.IsTrue(value == 23);
         }
 
         [TestCase(WeaponType.Sword, 21)]
         public void WeaponCollection_GetAllWeaponsOfType_ListOfWeapons(WeaponType type, int expectedValue)
         {
             // TODO: call WeaponCollection.GetAllWeaponsOfType(type) and confirm that the weapons list returns Count matches the expected value using asserts.
-            Assert.AreSame(expectedValue, weaponCollection.GetAllWeaponsOfType(type).Count);
+            LoadCollection();
+            Assert.IsTrue(weaponCollection.GetAllWeaponsOfType(type).Count == expectedValue);
         }
 
         [TestCase(5, 10)]
         public void WeaponCollection_GetAllWeaponsOfRarity_ListOfWeapons(int stars, int expectedValue)
         {
             // TODO: call WeaponCollection.GetAllWeaponsOfRarity(stars) and confirm that the weapons list returns Count matches the expected value using asserts.
-            Assert.AreSame(expectedValue, weaponCollection.GetAllWeaponsOfRarity(stars).Count);
+            LoadCollection();
+            Assert.IsTrue(weaponCollection.GetAllWeaponsOfRarity(stars).Count == expectedValue);
         }
 
         [Test]
@@ -79,7 +91,7 @@ namespace Assignment2a
             // TODO: load returns true, expect WeaponCollection with count of 95 .
             SetUp();
             Assert.IsTrue(weaponCollection.Load(inputPath));
-            Assert.AreSame(95, weaponCollection.Count);
+            Assert.IsTrue(weaponCollection.Count == 95);
             CleanUp();
         }
 
@@ -89,7 +101,7 @@ namespace Assignment2a
             // TODO: load returns false, expect an empty WeaponCollection
             SetUp();
             Assert.IsFalse(weaponCollection.Load(string.Empty));
-            Assert.AreSame(0, weaponCollection.Count);
+            Assert.AreEqual(0, weaponCollection.Count);
             CleanUp();
         }
 
@@ -100,7 +112,7 @@ namespace Assignment2a
             SetUp();
             Assert.IsTrue(weaponCollection.Save(outputPath));
             Assert.IsTrue(weaponCollection.Load(outputPath));
-            Assert.IsNotEmpty(weaponCollection);
+            Assert.IsTrue(weaponCollection != null);
             CleanUp();
         }
 
@@ -140,13 +152,13 @@ namespace Assignment2a
 
             // TODO: uncomment this once you have TryParse implemented.
             Assert.IsTrue(Weapon.TryParse(parameters, out actual));
-            Assert.Equals(expected.Name, actual.Name);
-            Assert.Equals(expected.Type, actual.Type);
-            Assert.Equals(expected.Image, actual.Image);
-            Assert.Equals(expected.Rarity, actual.Rarity);
-            Assert.Equals(expected.BaseAttack, actual.BaseAttack);
-            Assert.Equals(expected.SecondaryStat, actual.SecondaryStat);
-            Assert.Equals(expected.Passive, actual.Passive);
+            Assert.AreEqual(expected.Name, actual.Name);
+            Assert.AreEqual(expected.Type, actual.Type);
+            Assert.AreEqual(expected.Image, actual.Image);
+            Assert.AreEqual(expected.Rarity, actual.Rarity);
+            Assert.AreEqual(expected.BaseAttack, actual.BaseAttack);
+            Assert.AreEqual(expected.SecondaryStat, actual.SecondaryStat);
+            Assert.AreEqual(expected.Passive, actual.Passive);
             // TODO: check for the rest of the properties, Image,Rarity,SecondaryStat,Passive
         }
 
@@ -172,7 +184,7 @@ namespace Assignment2a
 
             // TODO: uncomment this once you have TryParse implemented.
             Assert.IsFalse(Weapon.TryParse(parameters, out actual));
-            Assert.Equals(null, actual);
+            Assert.AreEqual(null, actual);
         }
     }
 }

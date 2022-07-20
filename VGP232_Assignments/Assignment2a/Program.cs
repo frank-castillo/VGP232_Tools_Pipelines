@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 
 // TODO: Fill in your name and student number.
-// Assignment 1
+// Assignment 2
 // NAME: Juan Francisco Castillo Regalado
 // STUDENT NUMBER: 2042805
 
@@ -36,16 +36,16 @@ namespace Assignment2a
             // The results to be output to a file or to the console
             WeaponCollection results = new WeaponCollection();
 
-            //args = new string[7];
-            //args[0] = "-i";
-            //args[1] = "data.csv";
-            //args[2] = "-o";
-            //args[3] = "output.csv";
-            //args[4] = "-c";
-            //args[5] = "-s";
-            //args[6] = "Rarity";
+            args = new string[7];
+            args[0] = "-i";
+            args[1] = "data2.csv";
+            args[2] = "-o";
+            args[3] = "output.csv";
+            args[4] = "-c";
+            args[5] = "-s";
+            args[6] = "Rarity";
 
-            Console.WriteLine(args[6]);
+            //Console.WriteLine(args[6]);
 
             for (int i = 0; i < args.Length; i++)
             {

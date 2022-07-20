@@ -114,7 +114,7 @@ namespace Assignment2a
                         string line = reader.ReadLine();
                         string[] values = line.Split(',');
 
-                        if (values.Length != headerColumns.Length)
+                        if (values.Length == headerColumns.Length)
                         {
                             if (Weapon.TryParse(values, out Weapon weapon))
                             {

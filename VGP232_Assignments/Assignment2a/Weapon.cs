@@ -101,7 +101,7 @@ namespace Assignment2a
                 weapon.Name = RawData[0];
             }
 
-            if (Enum.TryParse<WeaponType>(RawData[2],out tempType))
+            if (Enum.TryParse<WeaponType>(RawData[1],out tempType))
             {
                 weapon.Type = tempType;
             }
@@ -153,7 +153,7 @@ namespace Assignment2a
             }
             else
             {
-                weapon.Name = RawData[5];
+                weapon.SecondaryStat = RawData[5];
             }
 
             if (RawData[6].Length < 0)
@@ -164,7 +164,7 @@ namespace Assignment2a
             }
             else
             {
-                weapon.Name = RawData[6];
+                weapon.Passive = RawData[6];
             }
 
             return true;
