@@ -152,7 +152,8 @@ namespace Assignment2a
                 // Check if the append flag is set, and if so, then open the file in append mode; otherwise, create the file to write.
                 if (File.Exists((filename)))
                 {
-                    fs = File.Open(filename, FileMode.Append);
+                    File.Delete(filename);
+                    fs = File.Open(filename, FileMode.Create);
                 }
                 else
                 {
