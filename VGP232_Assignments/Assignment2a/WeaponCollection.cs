@@ -2,11 +2,16 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Xml.Serialization;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Assignment2a
 {
-    public class WeaponCollection : List<Weapon>, IPeristence
+    [XmlRoot("WeaponCollection")]
+    public class WeaponCollection : List<Weapon>, ICsvSerializable, IJsonSerializable, IXmlSerializable
     {
+        [XmlIgnore]private bool _append { get; set; }
         public int GetHighestBaseAttack()
         {
             int highestAttack = 0;
@@ -97,79 +102,161 @@ namespace Assignment2a
 
         public bool Load(string fileName)
         {
-            try
+            if (!string.IsNullOrEmpty(fileName))
             {
-                using (StreamReader reader = new StreamReader(fileName))
+                string extension = Path.GetExtension(fileName);
+
+                if (extension.ToLower() == ".csv")
                 {
-                    // Skip the first line because header does not need to be parsed.
-                    // Name,Type,Rarity,BaseAttack, and other parameters
-
-                    string header = reader.ReadLine();
-                    string[] headerColumns = header.Split(',');
-
-                    // The rest of the lines looks like the following:
-                    // Skyward Blade,Sword,5,46
-                    while (reader.Peek() > 0)
+                    if (!LoadCSV(fileName))
                     {
-                        string line = reader.ReadLine();
-                        string[] values = line.Split(',');
-
-                        if (values.Length == headerColumns.Length)
-                        {
-                            if (Weapon.TryParse(values, out Weapon weapon))
-                            {
-                                this.Add(weapon);
-                            }
-                            else
-                            {
-                                Console.WriteLine("Failed to parse data into weapon. Please revise original data");
-                                return false;
-                            }
-                        }
-                        else
-                        {
-                            Console.WriteLine("Incorrect number of columns relating to weapon properties, please revise the data.");
-                            return false;
-                        }
+                        Console.WriteLine($"Failed to load file with {extension.ToLower()} extension. See message above for more details.");
+                        return false;
+                    }
+                    else
+                    {
+                        Console.WriteLine($"{extension} file loaded correctly");
                     }
                 }
+                else if (extension.ToLower() == ".json")
+                {
+                    if (!LoadJSON(fileName))
+                    {
+                        Console.WriteLine($"Failed to load file with {extension.ToLower()} extension. See message above for more details.");
+                        return false;
+                    }
+                    else
+                    {
+                        Console.WriteLine($"{extension} file loaded correctly");
+                    }
+                }
+                else if (extension.ToLower() == ".xml")
+                {
+                    if (!LoadXML(fileName))
+                    {
+                        Console.WriteLine($"Failed to load file with {extension.ToLower()} extension. See message above for more details.");
+                        return false;
+                    }
+                    else
+                    {
+                        Console.WriteLine($"{extension} file loaded correctly");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine($"{extension} is not a valid file extension! Please make sure you are using the correct file.");
+                    Console.WriteLine($"Use only .csv, .json, or .XML files");
+                    return false;
+                }
             }
-            catch (System.Exception ex)
+            else
             {
-                Console.WriteLine("Exception: " + ex.Message);
+                Console.WriteLine("Not a valid path to save the file. Path is non-existent");
                 return false;
             }
 
             return true;
         }
 
-        public bool Save(string filename)
+        public bool Save(string filename, bool append = false)
         {
+            _append = append;
+
             if (!string.IsNullOrEmpty(filename))
             {
-                FileStream fs;
+                string extension = Path.GetExtension(filename);
 
-                // Check if the append flag is set, and if so, then open the file in append mode; otherwise, create the file to write.
-                if (File.Exists((filename)))
+                if (extension == null)
                 {
-                    File.Delete(filename);
-                    fs = File.Open(filename, FileMode.Create);
+                    Console.WriteLine("Failed to obtain extension! Please make sure the path is correct and there are no typos in the file extension.");
+                    return false;
+                }
+                else if (extension.ToLower() == ".csv")
+                {
+                    if (!SaveAsCSV(filename))
+                    {
+                        Console.WriteLine($"Failed to save file with {extension.ToLower()} extension. See message above for more details.");
+                        return false;
+                    }
+                }
+                else if (extension.ToLower() == ".json")
+                {
+                    if (!SaveAsJSON(filename))
+                    {
+                        Console.WriteLine($"Failed to save file with {extension.ToLower()} extension. See message above for more details.");
+                        return false;
+                    }
+                }
+                else if (extension.ToLower() == ".xml")
+                {
+                    if (!SaveAsXML(filename))
+                    {
+                        Console.WriteLine($"Failed to save file with {extension.ToLower()} extension. See message above for more details.");
+                        return false;
+                    }
                 }
                 else
                 {
-                    fs = File.Open(filename, FileMode.Create);
+                    Console.WriteLine($"{extension} is not a valid file extension! Please make sure you are using the correct one.");
+                    Console.WriteLine($"Use only .csv, .json, or .XML files");
+                    return false;
                 }
+            }
+            else
+            {
+                Console.WriteLine("Not a valid path to save the file. Path is non-existent");
+                return false;
+            }
 
+            return true;
+        }
+
+        public bool LoadCSV(string filename)
+        {
+            if (File.Exists(filename))
+            {
                 try
                 {
-                    // opens a stream writer with the file handle to write to the output file.
-                    using (StreamWriter writer = new StreamWriter(fs))
+                    using (StreamReader reader = new StreamReader(filename))
                     {
-                        writer.WriteLine("Name,Type,Image,Rarity,BaseAttack,SecondaryStat,Passive");
+                        // Skip the first line because header does not need to be parsed.
+                        // Name,Type,Rarity,BaseAttack, and other parameters
 
-                        foreach (var weapon in this)
+                        if (reader.Peek() > 0)
                         {
-                            writer.WriteLine(weapon.ToString());
+                            string header = reader.ReadLine();
+                            string[] headerColumns = header.Split(',');
+
+                            // The rest of the lines looks like the following:
+                            // Skyward Blade,Sword,5,46
+                            while (reader.Peek() > 0)
+                            {
+                                string line = reader.ReadLine();
+                                string[] values = line.Split(',');
+
+                                if (values.Length == headerColumns.Length)
+                                {
+                                    if (Weapon.TryParse(values, out Weapon weapon))
+                                    {
+                                        this.Add(weapon);
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("Failed to parse data into weapon. Please revise original data");
+                                        return false;
+                                    }
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Incorrect number of columns relating to weapon properties, please revise the data.");
+                                    return false;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine("File is empty! No data to read");
+                            return false;
                         }
                     }
                 }
@@ -180,16 +267,233 @@ namespace Assignment2a
                 }
                 finally
                 {
-                    Console.WriteLine("Output file has been saved.");
+                    Console.WriteLine(".csv file loaded correctly.");
                 }
             }
             else
             {
-                Console.WriteLine("Not a valid path file to save this collection.");
+                Console.WriteLine("CSV file does not exist. Please check the filename and make sure it is correct");
+            }
+
+
+            return true;
+        }
+
+        public bool SaveAsCSV(string filename)
+        {
+            FileStream fs;
+
+            // Check if the append flag is set, and if so, then open the file in append mode; otherwise, create the file to write.
+            if (File.Exists((filename)) && _append)
+            {
+                fs = File.Open(filename, FileMode.Append, FileAccess.ReadWrite);
+            }
+            else if(File.Exists((filename)) && !_append)
+            {
+                fs = File.Open(filename, FileMode.Open, FileAccess.ReadWrite);
+            }
+            else
+            {
+                fs = File.Open(filename, FileMode.Create, FileAccess.ReadWrite);
+            }
+
+            try
+            {
+                // opens a stream writer with the file handle to write to the output file.
+                using (StreamWriter writer = new StreamWriter(fs))
+                {
+                    writer.WriteLine("Name,Type,Image,Rarity,BaseAttack,SecondaryStat,Passive");
+
+                    foreach (var weapon in this)
+                    {
+                        writer.WriteLine(weapon.ToString());
+                    }
+                }
+            }
+            catch (System.Exception ex)
+            {
+                Console.WriteLine("Exception: " + ex.Message);
                 return false;
+            }
+            finally
+            {
+                Console.WriteLine(".csv file has been saved correctly.");
+                fs.Close();
             }
 
             return true;
         }
+
+        public bool LoadJSON(string filename)
+        {
+            if (File.Exists(filename))
+            {
+                try
+                {
+                    using (StreamReader reader = new StreamReader(filename))
+                    {
+                        // Skip the first line because header does not need to be parsed.
+                        // Name,Type,Rarity,BaseAttack, and other parameters
+                        WeaponCollection tempCollection = new WeaponCollection();
+
+                        if (reader.Peek() > 0)
+                        {
+                            string jsonString = reader.ReadToEnd();
+                            tempCollection = JsonSerializer.Deserialize<WeaponCollection>(jsonString);
+
+                            this.Clear();
+
+                            foreach (var weapon in tempCollection)
+                            {
+                                this.Add(weapon);
+                            }
+
+                        }
+                        else
+                        {
+                            Console.WriteLine("File is empty! No data to read");
+                            return false;
+                        }
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    Console.WriteLine("Exception: " + ex.Message);
+                    return false;
+                }
+                finally
+                {
+                    Console.WriteLine(".csv file loaded correctly.");
+                }
+            }
+            else
+            {
+                Console.WriteLine(".json file does not exist. Please check the filename and make sure it is correct");
+            }
+
+            return true;
+        }
+
+        public bool SaveAsJSON(string filename)
+        {
+            FileStream fs;
+
+            // Check if the append flag is set, and if so, then open the file in append mode; otherwise, create the file to write.
+            if (File.Exists((filename)) && _append)
+            {
+                fs = File.Open(filename, FileMode.Append, FileAccess.ReadWrite);
+            }
+            else if (File.Exists((filename)) && !_append)
+            {
+                fs = File.Open(filename, FileMode.Open, FileAccess.ReadWrite);
+            }
+            else
+            {
+                fs = File.Open(filename, FileMode.Create, FileAccess.ReadWrite);
+            }
+
+            try
+            {
+                // opens a stream writer with the file handle to write to the output file.
+                using (StreamWriter writer = new StreamWriter(fs))
+                {
+                    var options = new JsonSerializerOptions { WriteIndented = true };
+                    string jsonString = JsonSerializer.Serialize<WeaponCollection>(this, options);
+                    writer.WriteLine(jsonString);
+                }
+            }
+            catch (System.Exception ex)
+            {
+                Console.WriteLine("Exception: " + ex.Message);
+                return false;
+            }
+            finally
+            {
+                Console.WriteLine(".json file has been saved correctly.");
+                fs.Close();
+            }
+
+            return true;
+        }
+
+        public bool LoadXML(string filename)
+        {
+            if (File.Exists(filename))
+            {
+                try
+                {
+                    WeaponCollection tempCollection = new WeaponCollection();
+
+                    using (FileStream fileStream = new FileStream(filename, FileMode.Open))
+                    {
+                        XmlSerializer xs = new XmlSerializer(typeof(WeaponCollection));
+                        tempCollection = (WeaponCollection)xs.Deserialize(fileStream);
+
+                        this.Clear();
+
+                        foreach (var weapon in tempCollection)
+                        {
+                            this.Add(weapon);
+                        }
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    Console.WriteLine("Saving file as XML file failed. See message below for more details.");
+                    Console.WriteLine("Exception: " + ex.Message);
+                    return false;
+                }
+                finally
+                {
+                    Console.WriteLine(".xml file loaded correctly.");
+                }
+            }
+            else
+            {
+                Console.WriteLine("XML file does not exist. Please check the filename and make sure it is correct");
+            }
+
+            return true;
+        }
+
+        public bool SaveAsXML(string filename)
+        {
+            try
+            {
+                FileMode mode = FileMode.Open;
+
+                if (File.Exists((filename)) && _append)
+                {
+                    mode = FileMode.Append;
+                }
+                else if (File.Exists((filename)) && !_append)
+                {
+                    mode = FileMode.Open;
+                }
+                else
+                {
+                    mode = FileMode.Create;
+                }
+
+                using (FileStream fs = new FileStream(filename, mode, FileAccess.ReadWrite))
+                {
+                    XmlSerializer xs = new XmlSerializer(typeof(WeaponCollection));
+                    xs.Serialize(fs, this);
+                }
+            }
+            catch (System.Exception ex)
+            {
+                Console.WriteLine("Saving file as XML file failed. See message below for more details.");
+                Console.WriteLine("Exception: " + ex.Message);
+                return false;
+            }
+            finally
+            {
+                Console.WriteLine("XML file saved correctly.");
+            }
+
+            return true;
+        }
+
     }
 }

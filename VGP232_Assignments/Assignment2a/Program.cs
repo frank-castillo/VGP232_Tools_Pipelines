@@ -38,14 +38,12 @@ namespace Assignment2a
 
             args = new string[7];
             args[0] = "-i";
-            args[1] = "data2.csv";
+            args[1] = "output.xml";
             args[2] = "-o";
-            args[3] = "output.csv";
+            args[3] = "output.xml";
             args[4] = "-c";
             args[5] = "-s";
             args[6] = "Rarity";
-
-            //Console.WriteLine(args[6]);
 
             for (int i = 0; i < args.Length; i++)
             {
@@ -212,50 +210,7 @@ namespace Assignment2a
 
             if (results.Count > 0)
             {
-                if (!string.IsNullOrEmpty(outputFile))
-                {
-                    FileStream fs;
-
-                    // Check if the append flag is set, and if so, then open the file in append mode; otherwise, create the file to write.
-                    if (appendToFile && File.Exists((outputFile)))
-                    {
-                        fs = File.Open(outputFile, FileMode.Append);
-                    }
-                    else
-                    {
-                        fs = File.Open(outputFile, FileMode.Create);
-                    }
-
-                    try
-                    {
-                        // opens a stream writer with the file handle to write to the output file.
-                        using (StreamWriter writer = new StreamWriter(fs))
-                        {
-                            writer.WriteLine("Name,Type,Image,Rarity,BaseAttack,SecondaryStat,Passive");
-
-                            foreach (var weapon in results)
-                            {
-                                writer.WriteLine(weapon.ToString());
-                            }
-                        }
-                    }
-                    catch (System.Exception ex)
-                    {
-                        Console.WriteLine("Exception: " + ex.Message);
-                    }
-                    finally
-                    {
-                        Console.WriteLine("Output file has been saved.");
-                    }
-                }
-                else
-                {
-                    // prints out each entry in the weapon list results.
-                    for (int i = 0; i < results.Count; i++)
-                    {
-                        Console.WriteLine(results[i]);
-                    }
-                }
+                results.Save(outputFile, appendToFile);
             }
 
             Console.WriteLine("Done!");

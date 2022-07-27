@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 
 namespace Assignment2a
 {
@@ -16,16 +17,17 @@ namespace Assignment2a
         None
     }
 
+    [XmlRoot("Weapon")]
     public class Weapon
     {
         // Name,Type,Rarity,BaseAttack
-        public string Name { get; set; }
-        public WeaponType Type { get; set; }
-        public int Rarity { get; set; }
-        public int BaseAttack { get; set; }
-        public string Image { get; set; }
-        public string SecondaryStat { get; set; }
-        public string Passive { get; set; }
+        [XmlElement("Name")]public string Name { get; set; }
+        [XmlElement("WeaponType")]public WeaponType Type { get; set; }
+        [XmlElement("Rarity")]public int Rarity { get; set; }
+        [XmlElement("BaseAttack")] public int BaseAttack { get; set; }
+        [XmlElement("Image")] public string Image { get; set; }
+        [XmlElement("SecondaryStat")] public string SecondaryStat { get; set; }
+        [XmlElement("Passive")] public string Passive { get; set; }
 
         /// <summary>
         /// The Comparator function to check for name
