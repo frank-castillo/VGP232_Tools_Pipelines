@@ -275,7 +275,6 @@ namespace Assignment2a
                 Console.WriteLine("CSV file does not exist. Please check the filename and make sure it is correct");
             }
 
-
             return true;
         }
 
@@ -347,7 +346,6 @@ namespace Assignment2a
                             {
                                 this.Add(weapon);
                             }
-
                         }
                         else
                         {
@@ -439,7 +437,7 @@ namespace Assignment2a
                 }
                 catch (System.Exception ex)
                 {
-                    Console.WriteLine("Saving file as XML file failed. See message below for more details.");
+                    Console.WriteLine("Loading file as XML file failed. See message below for more details.");
                     Console.WriteLine("Exception: " + ex.Message);
                     return false;
                 }

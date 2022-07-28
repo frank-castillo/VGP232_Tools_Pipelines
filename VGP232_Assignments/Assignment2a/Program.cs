@@ -30,6 +30,9 @@ namespace Assignment2a
             // The flag to determine if we need to sort the results via name.
             bool sortEnabled = false;
 
+            // The flag to determine if we need to save our file
+            bool saveFile = false;
+
             // The column name to be used to determine which sort comparison function to use.
             string sortColumnName = string.Empty;
 
@@ -153,6 +156,7 @@ namespace Assignment2a
                         else
                         {
                             outputFile = filePath;
+                            saveFile = true;
                         }
                     }
                 }
@@ -208,9 +212,13 @@ namespace Assignment2a
                 Console.WriteLine($"There are {results.Count} entries");
             }
 
-            if (results.Count > 0)
+            if (results.Count > 0 && saveFile)
             {
                 results.Save(outputFile, appendToFile);
+            }
+            else if (results.Count <= 0 && saveFile)
+            {
+                Console.WriteLine($"Collection is empty. Nothing to save or append.");
             }
 
             Console.WriteLine("Done!");
