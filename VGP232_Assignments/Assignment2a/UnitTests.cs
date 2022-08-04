@@ -421,7 +421,5 @@ namespace Assignment2a
             Assert.IsTrue(weaponCollection.Count == 0);
             CleanUp();
         }
-
-
     }
 }

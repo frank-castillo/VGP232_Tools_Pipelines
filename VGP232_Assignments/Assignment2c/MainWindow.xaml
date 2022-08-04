@@ -1,0 +1,31 @@
+﻿<Window x:Class="Assignment2c.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Assignment2c"
+        mc:Ignorable="d"
+        Title="Weapons Editor" Height="520" Width="470">
+    <Canvas>
+        <Button x:Name="LoadClickedButton" Content="Load" HorizontalAlignment="Left" Margin="20,9,0,0" VerticalAlignment="Top" Width="70" Height="30" FontSize="14" Click="LoadClicked"/>
+        <Button x:Name="SaveClickedButton" Content="Save" HorizontalAlignment="Left" Margin="108,9,0,0" VerticalAlignment="Top" Width="70" Height="30" FontSize="14" Click="SaveClicked"/>
+        <TextBlock Margin="20,60,400,358">Sort by:</TextBlock>
+        <WrapPanel Orientation="Horizontal" Margin="108,60,454,372" Width="240" Height="60">
+            <RadioButton x:Name="SortName" Margin="5" Checked="SortRadioSelected" GroupName="SortFunction" Content="Name"/>
+            <RadioButton x:Name="SortBaseAttack" Margin="10,5,5,5" Checked="SortRadioSelected" GroupName="SortFunction" Content="BaseAttack"/>
+            <RadioButton x:Name="SortRarirty" Margin="20,5,5,5" Checked="SortRadioSelected" GroupName="SortFunction" Content="Rarity"/>
+            <RadioButton x:Name="SortPassive" Margin="5" Checked="SortRadioSelected" GroupName="SortFunction" Content="Passive"/>
+            <RadioButton x:Name="SortSecondaryStat" Margin="5" Checked="SortRadioSelected" GroupName="SortFunction" Content="SecondaryStat"/>
+        </WrapPanel>
+        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Show only type" VerticalAlignment="Top" Width="90" Canvas.Left="20" Canvas.Top="127"/>
+        <ComboBox Name="WeaponTypeBox" HorizontalAlignment="Center" VerticalAlignment="Top" Width="230" SelectionChanged="WeaponType_SelectionChanged" Canvas.Left="118" Canvas.Top="125">
+        </ComboBox>
+        <ListBox x:Name="WeaponsViewList" Height="240" Width="328" Canvas.Left="20" Canvas.Top="225" HorizontalAlignment="Center" VerticalAlignment="Top" SelectionChanged="WeaponsViewList_SelectionChanged"/>
+        <TextBlock TextWrapping="Wrap" Text="Filter by name" Width="90" Canvas.Left="20" Canvas.Top="178" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+        <TextBox x:Name="FilterInput" Canvas.Left="118" TextWrapping="Wrap" Text="" Canvas.Top="176" Width="230" HorizontalAlignment="Center" VerticalAlignment="Top" TextChanged="TextBox_TextChanged"/>
+        <Button x:Name="AddClickedButton" Content="Add" Width="70" Height="30" FontSize="14" Click="AddClicked" Canvas.Left="370" Canvas.Top="225"/>
+        <Button x:Name="EditClickedButton" Content="Edit" Width="70" Height="30" FontSize="14" Click="EditClicked" Canvas.Left="370" Canvas.Top="275" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+        <Button x:Name="RemoveClickedButton" Content="Remove" Width="70" Height="30" FontSize="14" Click="RemoveClicked" Canvas.Left="370" Canvas.Top="325" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+        <Label x:Name="LabelCount" Content="Label" Canvas.Left="197" Canvas.Top="11" HorizontalAlignment="Left" VerticalAlignment="Center" Width="151"/>
+    </Canvas>
+</Window>
