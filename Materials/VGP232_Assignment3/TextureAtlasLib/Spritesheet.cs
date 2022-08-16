@@ -6,16 +6,29 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 
 namespace TextureAtlasLib
 {
+    [XmlRoot("SpriteSheet")]
     public class Spritesheet
     {
-        public int Columns { get; set; }
-        public String OutputFile { get; set; }
-        public String OutputDirectory { get; set; }
-        public bool IncludeMetaData { get; set; }
-        public List<String> InputPaths { get; set; }
+        [XmlElement("Columns")] public int Columns { get; set; }
+        [XmlElement("OutputFile")] public String OutputFile { get; set; }
+        [XmlElement("OutputDirectory")] public String OutputDirectory { get; set; }
+        [XmlElement("PNGOutputFile")] public string PNGOutputFile { get; set; }
+        [XmlElement("MetaData")] public bool IncludeMetaData { get; set; }
+        [XmlElement("InputPathsList")] public List<String> InputPaths { get; set; }
+
+        public void InitializeSheet()
+        {
+            Columns = 0;
+            OutputFile = string.Empty;
+            OutputDirectory = string.Empty;
+            PNGOutputFile = string.Empty;
+            IncludeMetaData = false;
+            InputPaths = new List<string>();
+        }
 
         /// <summary>
         /// Checks if the properties are set correctly. If it is not correct, then it will throw an exception.
@@ -41,7 +54,6 @@ namespace TextureAtlasLib
             {
                 throw new Exception("Column size must be at least 1");
             }
-
         }
 
         /// <summary>

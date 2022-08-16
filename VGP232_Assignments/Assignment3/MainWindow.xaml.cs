@@ -24,39 +24,32 @@ using System.Collections.ObjectModel;
 namespace Assignment3
 {
     // Code taken from: https://www.wpf-tutorial.com/commands/implementing-custom-commands/
-    [XmlRoot("SpritesheetXML")]
     public partial class MainWindow : Window
     {
-        [XmlElement("OutputDirectory")] string OutputDirectory = String.Empty;
-        [XmlElement("FileName")] string OutputFile = String.Empty;
-        [XmlElement("PNGFileName")] string PNGOutputFile = String.Empty;
-        [XmlElement("Images")] List<string> ImagePaths = new List<string>();
-        [XmlElement("Metadata")] bool includeMetaData = false;
+        private Spritesheet _spriteSheet = new Spritesheet();
+        bool includeMetaData = false;
 
-        [XmlIgnore] string fullPath = string.Empty;
-        [XmlIgnore] bool fileWasOpened = false;
-        [XmlIgnore] ObservableCollection<MyImage> _images = new ObservableCollection<MyImage>();
-        [XmlIgnore] Spritesheet _spritesheet = new Spritesheet();
-        public ObservableCollection<MyImage> Images
-        {
-            get { return _images; }
-            set { _images = value; }
-        }
+        string fullPath = string.Empty;
+        bool fileWasOpened = false;
+        List<Image> _images = new List<Image>();
 
         public MainWindow()
         {
             InitializeComponent();
             this.DataContext = this;
+            _spriteSheet.InitializeSheet();
         }
 
         private void MetadataCheckbox_Checked(object sender, RoutedEventArgs e)
         {
             includeMetaData = true;
+            _spriteSheet.IncludeMetaData = includeMetaData;
         }
 
         private void MetadataCheckbox_Unchecked(object sender, RoutedEventArgs e)
         {
             includeMetaData = false;
+            _spriteSheet.IncludeMetaData = includeMetaData;
         }
 
         private void BrowseButton_Click(object sender, RoutedEventArgs e)
@@ -72,14 +65,14 @@ namespace Assignment3
             // Process save file dialog box results
             if (result == true)
             {
-                OutputDirectory = Path.GetDirectoryName(dlg.FileName);
-                OutputFile = Path.GetFileNameWithoutExtension(dlg.FileName) + ".xml";
-                tbOutputDir.Text = OutputDirectory;
+                _spriteSheet.OutputDirectory = Path.GetDirectoryName(dlg.FileName);
+                _spriteSheet.OutputFile = Path.GetFileNameWithoutExtension(dlg.FileName) + ".xml";
+                tbOutputDir.Text = _spriteSheet.OutputDirectory;
                 tbOutputFile.Text = Path.GetFileName(dlg.FileName);
-                PNGOutputFile = tbOutputFile.Text;
+                _spriteSheet.PNGOutputFile = tbOutputFile.Text;
                 fileWasOpened = true;
-                ProjectName.Text = OutputFile;
-                fullPath = OutputDirectory + OutputFile;
+                ProjectName.Text = _spriteSheet.OutputFile;
+                fullPath = _spriteSheet.OutputDirectory + _spriteSheet.OutputFile;
             }
         }
 
@@ -96,15 +89,12 @@ namespace Assignment3
             {
                 foreach (var file in openFileDialog.FileNames)
                 {
-                    ImagePaths.Add(file);
-
-                    BitmapImage bitmap = new BitmapImage();
+                    _spriteSheet.InputPaths.Add(file);
+                    Image image = new Image();
 
                     try
                     {
-                        bitmap.BeginInit();
-                        bitmap.UriSource = new Uri(file, UriKind.Absolute);
-                        bitmap.EndInit();
+                        image.Source = new BitmapImage(new Uri(file));
                     }
                     catch (Exception i)
                     {
@@ -112,11 +102,13 @@ namespace Assignment3
                         continue;
                     }
 
-                    _images.Add(new MyImage(bitmap, file));
+                    _images.Add(image);
                 }
 
+                ImagesBox.DataContext = _images;
                 ImagesBox.ItemsSource = _images;
                 tbColumns.Text = ImagesBox.Items.Count.ToString();
+                _spriteSheet.Columns = ImagesBox.Items.Count;
             }
         }
 
@@ -128,13 +120,13 @@ namespace Assignment3
         private void GenerateButton_Click(object sender, RoutedEventArgs e)
         {
             int.TryParse(tbColumns.Text, out int columns);
-            _spritesheet.Columns = columns;
-            _spritesheet.OutputFile = tbOutputFile.Text;
-            _spritesheet.OutputDirectory = OutputDirectory;
-            _spritesheet.IncludeMetaData = includeMetaData;
-            _spritesheet.InputPaths = ImagePaths;
+            _spriteSheet.Columns = columns;
+            _spriteSheet.OutputFile = tbOutputFile.Text;
+            _spriteSheet.OutputDirectory = _spriteSheet.OutputDirectory;
+            _spriteSheet.IncludeMetaData = includeMetaData;
+            _spriteSheet.InputPaths = _spriteSheet.InputPaths;
 
-            _spritesheet.Generate(true);
+            _spriteSheet.Generate(true);
 
             string message = (includeMetaData == true) ? "SpriteSheet and metadata file created. Open the SpriteSheet file?" : "SpriteSheet created. Open the SpriteSheet file?";
             string caption = "SpriteSheet created.";
@@ -152,7 +144,7 @@ namespace Assignment3
                 case MessageBoxResult.Yes:
                     System.Diagnostics.Process process = new System.Diagnostics.Process();
                     process.StartInfo.UseShellExecute = true;
-                    process.StartInfo.FileName = @$"{OutputDirectory}";
+                    process.StartInfo.FileName = @$"{_spriteSheet.OutputDirectory}";
                     process.Start();
                     break;
                 case MessageBoxResult.No:
@@ -170,7 +162,7 @@ namespace Assignment3
 
         private void NewCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            if(fileWasOpened)
+            if (fileWasOpened)
             {
                 string message = "Would you like to save your changes?";
                 string caption = "Open File detected.";
@@ -305,7 +297,10 @@ namespace Assignment3
 
         private void RemoveCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = true;
+            if (_spriteSheet.InputPaths.Count < 1)
+                e.CanExecute = false;
+            else if (_spriteSheet.InputPaths.Count >= 1)
+                e.CanExecute = true;
         }
 
         private void RemoveCommand_Executed(object sender, ExecutedRoutedEventArgs e)
@@ -315,16 +310,20 @@ namespace Assignment3
 
         private void RemoveAllCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = true;
+            if (_spriteSheet.InputPaths.Count < 1)
+                e.CanExecute = false;
+            else if (_spriteSheet.InputPaths.Count >= 1)
+                e.CanExecute = true;
         }
 
         private void RemoveAllCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            ImagePaths.Clear();
+            _spriteSheet.InputPaths.Clear();
             _images.Clear();
             ImagesBox.ItemsSource = null;
             ImagesBox.SelectedIndex = -1;
             tbColumns.Text = ImagesBox.Items.Count.ToString();
+            _spriteSheet.Columns = ImagesBox.Items.Count;
         }
 
         private void Reset()
@@ -336,7 +335,12 @@ namespace Assignment3
             MetadataCheckbox.IsChecked = false;
             ImagesBox.ItemsSource = null;
             ImagesBox.SelectedIndex = -1;
-            ImagePaths.Clear();
+            _spriteSheet.InputPaths.Clear();
+            _spriteSheet.IncludeMetaData = false;
+            _spriteSheet.PNGOutputFile = String.Empty;
+            _spriteSheet.OutputFile = String.Empty;
+            _spriteSheet.OutputDirectory = String.Empty;
+            _spriteSheet.Columns = 0;
             _images.Clear();
             fileWasOpened = false;
             tbColumns.Text = ImagesBox.Items.Count.ToString();
@@ -352,8 +356,8 @@ namespace Assignment3
                 {
                     using (FileStream fs = new FileStream(fullPath, mode, FileAccess.ReadWrite))
                     {
-                        XmlSerializer xs = new XmlSerializer(typeof(MainWindow));
-                        xs.Serialize(fs, this);
+                        XmlSerializer xs = new XmlSerializer(typeof(Spritesheet));
+                        xs.Serialize(fs, _spriteSheet);
                     }
                 }
                 else
@@ -384,17 +388,17 @@ namespace Assignment3
                 try
                 {
                     fullPath = dlg.FileName;
-                    OutputDirectory = Path.GetDirectoryName(dlg.FileName);
-                    OutputFile = Path.GetFileName(dlg.FileName);
-                    tbOutputDir.Text = OutputDirectory;
-                    ProjectName.Text = OutputFile;
+                    _spriteSheet.OutputDirectory = Path.GetDirectoryName(dlg.FileName);
+                    _spriteSheet.OutputFile = Path.GetFileName(dlg.FileName);
+                    tbOutputDir.Text = _spriteSheet.OutputDirectory;
+                    ProjectName.Text = _spriteSheet.OutputFile;
 
                     FileMode mode = FileMode.Create;
 
                     using (FileStream fs = new FileStream(fullPath, mode, FileAccess.ReadWrite))
                     {
-                        XmlSerializer xs = new XmlSerializer(typeof(Window));
-                        xs.Serialize(fs, this);
+                        XmlSerializer xs = new XmlSerializer(typeof(Spritesheet));
+                        xs.Serialize(fs, _spriteSheet);
                     }
                 }
                 catch (System.Exception ex)
@@ -419,13 +423,12 @@ namespace Assignment3
                 {
                     List<string> validImages = new List<string>();
                     List<string> missingImages = new List<string>();
-                    var tempWindow = new MainWindow();
-                    tempWindow.Close();
+                    Spritesheet tempSheet = new Spritesheet();
 
                     try
                     {
-                        XmlSerializer xs = new XmlSerializer(typeof(MainWindow));
-                        tempWindow = (MainWindow)xs.Deserialize(fileStream);
+                        XmlSerializer xs = new XmlSerializer(typeof(Spritesheet));
+                        tempSheet = (Spritesheet)xs.Deserialize(fileStream);
                     }
                     catch (System.Exception ex)
                     {
@@ -433,16 +436,19 @@ namespace Assignment3
                         return;
                     }
 
-                    OutputDirectory = tempWindow.OutputDirectory;
-                    OutputFile = tempWindow.OutputFile;
-                    includeMetaData = tempWindow.includeMetaData;
-                    PNGOutputFile = tempWindow.PNGOutputFile;
-                    tbOutputDir.Text = OutputDirectory;
-                    tbOutputFile.Text = PNGOutputFile;
+                    //TODO::FIX ALL THIS
+                    _spriteSheet.OutputDirectory = tempSheet.OutputDirectory;
+                    _spriteSheet.OutputFile = tempSheet.OutputFile;
+                    _spriteSheet.IncludeMetaData = tempSheet.IncludeMetaData;
+                    _spriteSheet.PNGOutputFile = tempSheet.PNGOutputFile;
+                    tbOutputDir.Text = _spriteSheet.OutputDirectory;
+                    tbOutputFile.Text = _spriteSheet.PNGOutputFile;
                     MetadataCheckbox.IsChecked = includeMetaData;
-                    ProjectName.Text = OutputFile;
+                    ProjectName.Text = _spriteSheet.OutputFile;
 
-                    foreach (var image in tempWindow.ImagePaths)
+                    _spriteSheet.InputPaths.Clear();
+
+                    foreach (var image in tempSheet.InputPaths)
                     {
                         if (!File.Exists(image))
                         {
@@ -457,12 +463,11 @@ namespace Assignment3
                     foreach (var image in validImages)
                     {
                         BitmapImage bitmap = new BitmapImage();
+                        Image newImage = new Image();
 
                         try
                         {
-                            bitmap.BeginInit();
-                            bitmap.UriSource = new Uri(image, UriKind.Absolute);
-                            bitmap.EndInit();
+                            newImage.Source = new BitmapImage(new Uri(image));
                         }
                         catch (Exception i)
                         {
@@ -470,7 +475,7 @@ namespace Assignment3
                             continue;
                         }
 
-                        _images.Add(new MyImage(bitmap, image));
+                        _images.Add(newImage);
                     }
 
                     if (missingImages.Count > 0)
@@ -483,17 +488,18 @@ namespace Assignment3
                         MessageBox.Show(missingItems);
                     }
 
-                    ImagePaths = validImages;
+                    _spriteSheet.InputPaths = validImages;
                     ImagesBox.ItemsSource = _images;
                     fileWasOpened = true;
                     tbColumns.Text = ImagesBox.Items.Count.ToString();
+                    _spriteSheet.Columns = ImagesBox.Items.Count;
                 }
             }
         }
 
         private void Remove()
         {
-            if (ImagePaths.Count == 0)
+            if (_spriteSheet.InputPaths.Count == 0)
             {
                 MessageBox.Show("Your collection is empty. Nothing to remove.");
                 return;
@@ -505,19 +511,20 @@ namespace Assignment3
             }
 
             var selectedImage = _images[ImagesBox.SelectedIndex];
-            var selectedPath = ImagePaths[ImagesBox.SelectedIndex];
-            ImagePaths.Remove(selectedPath);
+            var selectedPath = _spriteSheet.InputPaths[ImagesBox.SelectedIndex];
+            _spriteSheet.InputPaths.Remove(selectedPath);
             _images.Remove(selectedImage);
             ImagesBox.ItemsSource = _images;
             ImagesBox.SelectedIndex = -1;
             tbColumns.Text = ImagesBox.Items.Count.ToString();
+            _spriteSheet.Columns = ImagesBox.Items.Count;
         }
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+    [XmlRoot("CustomCommand")]
     public static class CustomCommands
     {
         // Code taken from: https://www.wpf-tutorial.com/commands/implementing-custom-commands/
@@ -566,27 +573,5 @@ namespace Assignment3
                     new KeyGesture(Key.X, ModifierKeys.Alt)
                 }
             );
-    }
-
-    public class MyImage
-    {
-        private ImageSource _image;
-        private string _fileName;
-        public ImageSource ImageSource
-        {
-            get { return _image; }
-            set { _image = value; }
-        }
-
-        public string FileName
-        {
-            get { return _fileName; }
-            set { _fileName = value; }
-        }
-        public MyImage(ImageSource image, string filename)
-        {
-            _image = image;
-            _fileName = filename;
-        }
     }
 }

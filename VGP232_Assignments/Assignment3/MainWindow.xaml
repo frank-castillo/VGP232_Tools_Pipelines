@@ -42,14 +42,17 @@
         <TextBlock x:Name="FileName" Canvas.Left="20" TextWrapping="Wrap" Canvas.Top="140" Width="105" Height="30" HorizontalAlignment="Center" VerticalAlignment="Top"><Run Language="en-ca" Text="Filename (.png)"/></TextBlock>
         <TextBox x:Name="tbColumns" Canvas.Left="130" TextWrapping="Wrap" Text="" Canvas.Top="185" Width="225" Height="30" HorizontalAlignment="Left" VerticalAlignment="Center"/>
         <TextBlock x:Name="Columns" Canvas.Left="20" TextWrapping="Wrap" Canvas.Top="185" Width="106" Height="30" HorizontalAlignment="Left" VerticalAlignment="Top"><Run Language="en-ca" Text="Columns"/></TextBlock>
-        <ListBox ItemsSource="{Binding Images}" x:Name="ImagesBox" Height="194" Width="560" Canvas.Left="20" Canvas.Top="230" Visibility="Visible">
-            <ListBox.ItemTemplate>
-                <DataTemplate>
-                    <StackPanel Orientation="Vertical">
-                        <Image Source="{Binding ImageSource}"/>
-                    </StackPanel>
-                </DataTemplate>
-            </ListBox.ItemTemplate>
+        <ListBox x:Name="ImagesBox" Height="200" Width="560" Canvas.Left="20" Canvas.Top="230">
+            <ListBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <StackPanel Orientation="Horizontal" />
+                </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="ListBoxItem">
+                    <Setter Property="Padding" Value="30 0 30 0" />
+                </Style>
+            </ListBox.ItemContainerStyle>
         </ListBox>
         <TextBlock x:Name="ProjectName" Canvas.Left="20" TextWrapping="Wrap" Canvas.Top="50" Width="105" Height="30" HorizontalAlignment="Center" VerticalAlignment="Top"><Run Language="en-ca" Text=""/></TextBlock>
         <CheckBox x:Name="MetadataCheckbox" Content="Include meta data (.json)" Canvas.Left="400" Canvas.Top="191" FontSize="14" Checked="MetadataCheckbox_Checked" HorizontalAlignment="Left" VerticalAlignment="Center" Width="180" Unchecked="MetadataCheckbox_Unchecked"/>
