@@ -83,7 +83,7 @@ namespace Assignment3
             openFileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             openFileDialog.Multiselect = true;
             openFileDialog.Title = "Images Selector";
-            Nullable<bool> result = openFileDialog.ShowDialog(); ;
+            Nullable<bool> result = openFileDialog.ShowDialog();
 
             if (result == true)
             {
@@ -514,6 +514,8 @@ namespace Assignment3
             var selectedPath = _spriteSheet.InputPaths[ImagesBox.SelectedIndex];
             _spriteSheet.InputPaths.Remove(selectedPath);
             _images.Remove(selectedImage);
+            ImagesBox.ItemsSource = null;
+            ImagesBox.DataContext = _images;
             ImagesBox.ItemsSource = _images;
             ImagesBox.SelectedIndex = -1;
             tbColumns.Text = ImagesBox.Items.Count.ToString();
