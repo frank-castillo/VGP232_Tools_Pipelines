@@ -1,0 +1,42 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f8e839bc892d4744a83a46cf431e8311, type: 3}
+  m_Name: Default Skin
+  m_EditorClassIdentifier: 
+  buttonSprite: {fileID: 21300000, guid: 970d574d72d68e744b59382781515142, type: 3}
+  buttonSpriteState:
+    m_HighlightedSprite: {fileID: 21300000, guid: f3a7a5cda7b04f24794559ce75cc2fcc, type: 3}
+    m_PressedSprite: {fileID: 21300000, guid: ed169c7ef182f0e44a5d758e6a61410d, type: 3}
+    m_SelectedSprite: {fileID: 21300000, guid: ed169c7ef182f0e44a5d758e6a61410d, type: 3}
+    m_DisabledSprite: {fileID: 21300000, guid: 691e40e3ae6c416488a007da9c5e389c, type: 3}
+  useIcon: 0
+  useText: 0
+  defaultButtonColor: {r: 1, g: 0, b: 0, a: 1}
+  defaultButtonIcon: {fileID: 21300000, guid: a1d9cb3eb505c114d8fa17fcbaeb157c, type: 3}
+  defaultButtonText: Default
+  confirmButtonColor: {r: 0.5633218, g: 0.4481132, b: 1, a: 1}
+  confirmButtonIcon: {fileID: 21300000, guid: 9cd6991b040b7fb40808e500b041d545, type: 3}
+  confirmButtonText: Confirm
+  declineButtonColor: {r: 1, g: 0, b: 0, a: 1}
+  declineButtonIcon: {fileID: 21300000, guid: e839e6693c344ad40a5952853a891866, type: 3}
+  declineButtonText: Decline
+  warningButtonColor: {r: 1, g: 1, b: 0, a: 1}
+  warningButtonIcon: {fileID: 21300000, guid: b6a757f6793cb0148a905bea74154284, type: 3}
+  warningButtonText: Warning
+  backButtonColor: {r: 1, g: 1, b: 1, a: 1}
+  backButtonIcon: {fileID: 21300000, guid: 98d20fe739e52024d8acf8e32bf24b1c, type: 3}
+  backButtonText: Back
+  toggleButtonColor: {r: 1, g: 1, b: 1, a: 1}
+  toggleButtonImage: {fileID: 21300000, guid: dbbf60cd0fb781e43aaac34dd180e356, type: 3}
+  toggleButtonCheckColor: {r: 1, g: 1, b: 1, a: 1}
+  toggleButtonCheckImage: {fileID: 21300000, guid: 25887e1e767bc774e9a24997a9343056, type: 3}
+  toggleButtonText: Toggle
